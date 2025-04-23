@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🗽 Stars, Stripes & State Capitals 🇺🇸</title>
+  <style>
+    body {
+      background-color: #cce7ff;
+      color: black;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    .main-container {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+    }
+    .button-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .link-button {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 5px;
+      text-decoration: none;
+    }
+    .link-button:hover {
+      background-color: #005f99;
+    }
+    .fact-box {
+      width: 300px;
+      background-color: #e6f3ff;
+      border: 6px double red;
+      border-image: linear-gradient(to right, red, white, blue) 1;
+      padding: 15px;
+      border-radius: 10px;
+      font-style: italic;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .question-container {
+      max-width: 600px;
+    }
+    .question-number {
+      font-size: 1em;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .question {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .option-button {
+      background-color: white;
+      border: 2px solid #007acc;
+      border-radius: 8px;
+      padding: 10px 20px;
+      margin: 5px 0;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1em;
+      text-align: left;
+    }
+    .option-button.selected {
+      background-color: #b3d9ff;
+    }
+    .submit-btn {
+      margin-top: 15px;
+      padding: 10px 30px;
+      font-size: 1em;
+      border-radius: 10px;
+      border: none;
+      background-color: #007acc;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      font-size: 1.5em;
+      margin: 10px 0;
+    }
+    .correct { color: green; }
+    .incorrect { color: red; }
+    .score {
+      font-size: 1.2em;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Button Container -->
+  <div class="button-container">
+    <a href="index.html" class="link-button">Resume</a>
+    <a href="scratch.html" class="link-button">Scratch</a>
+  </div>
+
+  <h1>🗽 Stars, Stripes & State Capitals 🇺🇸</h1>
+
+  <div class="main-container">
+    <div class="fact-box" id="fact-box">
+      Did you know? Loading...
+    </div>
+
+    <div id="game">
+      <div class="question-container" id="question-container">
+        <div class="question-number" id="question-number">Loading...</div>
+        <div class="question" id="question-text">Loading question...</div>
+        <div class="options" id="options-container"></div>
+        <button class="submit-btn" onclick="submitAnswer()">Submit</button>
+        <div class="result" id="result"></div>
+        <div class="score" id="score">Score: 0%</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const statesAndCapitals = {
+      "Alabama": "Montgomery", "Alaska": "Juneau", "Arizona": "Phoenix", "Arkansas": "Little Rock",
+      "California": "Sacramento", "Colorado": "Denver", "Connecticut": "Hartford", "Delaware": "Dover",
+      "Florida": "Tallahassee", "Georgia": "Atlanta", "Hawaii": "Honolulu", "Idaho": "Boise",
+      "Illinois": "Springfield", "Indiana": "Indianapolis", "Iowa": "Des Moines", "Kansas": "Topeka",
+      "Kentucky": "Frankfort", "Louisiana": "Baton Rouge", "Maine": "Augusta", "Maryland": "Annapolis",
+      "Massachusetts": "Boston", "Michigan": "Lansing", "Minnesota": "Saint Paul", "Mississippi": "Jackson",
+      "Missouri": "Jefferson City", "Montana": "Helena", "Nebraska": "Lincoln", "Nevada": "Carson City",
+      "New Hampshire": "Concord", "New Jersey": "Trenton", "New Mexico": "Santa Fe", "New York": "Albany",
+      "North Carolina": "Raleigh", "North Dakota": "Bismarck", "Ohio": "Columbus", "Oklahoma": "Oklahoma City",
+      "Oregon": "Salem", "Pennsylvania": "Harrisburg", "Rhode Island": "Providence", "South Carolina": "Columbia",
+      "South Dakota": "Pierre", "Tennessee": "Nashville", "Texas": "Austin", "Utah": "Salt Lake City",
+      "Vermont": "Montpelier", "Virginia": "Richmond", "Washington": "Olympia", "West Virginia": "Charleston",
+      "Wisconsin": "Madison", "Wyoming": "Cheyenne"
+    };
+
+    const stateFacts = [
+      "Alaska is the largest state by area.",
+      "Rhode Island is the smallest state.",
+      "California has the highest population.",
+      "Texas was once an independent country.",
+      "Florida is known for its beaches and oranges.",
+      "Hawaii is the only U.S. state made up entirely of islands.",
+      "Maine is the only state with a single-syllable name.",
+      "Montana has more cows than people.",
+      "Nevada is the driest state in the U.S.",
+      "Oregon has more ghost towns than any other state.",
+      "North Dakota is the least visited state.",
+      "Arizona is home to the Grand Canyon.",
+      "Illinois is the home of Abraham Lincoln.",
+      "Colorado has the highest average elevation of any state.",
+      "New Jersey has the most diners in the world.",
+      "Georgia is known as the Peach State.",
+      "Utah has the greatest snow on Earth.",
+      "New Mexico has a hot air balloon festival every year.",
+      "South Dakota is home to Mount Rushmore.",
+      "Washington is where Starbucks was founded."
+    ];
+
+    let remainingStates = Object.keys(statesAndCapitals);
+    let gameStates = [];
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+    let selectedAnswer = null;
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startGame() {
+      gameStates = shuffle(remainingStates).slice(0, 10);
+      currentQuestion = 0;
+      correctAnswers = 0;
+      selectedAnswer = null;
+      showQuestion();
+      updateScore();
+    }
+
+    function showQuestion() {
+      const state = gameStates[currentQuestion];
+      const correctCapital = statesAndCapitals[state];
+
+      document.getElementById("question-number").textContent = `Question ${currentQuestion + 1} of 10`;
+      document.getElementById("question-text").textContent = `What is the capital of ${state}?`;
+
+      const allCapitals = Object.values(statesAndCapitals).filter(c => c !== correctCapital);
+      const randomOptions = shuffle(allCapitals).slice(0, 3);
+      randomOptions.push(correctCapital);
+      shuffle(randomOptions);
+
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+      document.getElementById("result").innerHTML = "";
+
+      randomOptions.forEach(option => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.classList.add("option-button");
+        button.onclick = () => {
+          document.querySelectorAll(".option-button").forEach(btn => btn.classList.remove("selected"));
+          button.classList.add("selected");
+          selectedAnswer = option;
+        };
+        optionsContainer.appendChild(button);
+      });
+
+      showRandomFact();
+    }
+
+    function submitAnswer() {
+      if (!selectedAnswer) return;
+
+      const correctCapital = statesAndCapitals[gameStates[currentQuestion]];
+      const resultEl = document.getElementById("result");
+
+      if (selectedAnswer === correctCapital) {
+        resultEl.textContent = "Correct!";
+        resultEl.className = "result correct";
+        correctAnswers++;
+      } else {
+        resultEl.textContent = `Incorrect! The correct answer was ${correctCapital}.`;
+        resultEl.className = "result incorrect";
+      }
+
+      currentQuestion++;
+      selectedAnswer = null;
+      updateScore();
+
+      if (currentQuestion < gameStates.length) {
+        setTimeout(showQuestion, 1500);
+      }
+    }
+
+    function updateScore() {
+      const percent = Math.round((correctAnswers / gameStates.length) * 100);
+      document.getElementById("score").textContent = `Score: ${percent}%`;
+    }
+
+    function showRandomFact() {
+      const fact = stateFacts[Math.floor(Math.random() * stateFacts.length)];
+      document.getElementById("fact-box").textContent = `Did you know? ${fact}`;
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>
